@@ -65,7 +65,7 @@ if defined?(Curl)
             {lib: :curb}, request_signature, webmock_response)
           invoke_curb_callbacks
           true
-        elsif WebMock.net_connect_allowed?(request_signature.uri)
+        elsif WebMock.net_connect_allowed?(request_signature.uri, request_signature.method)
           res = yield
           if WebMock::CallbackRegistry.any_callbacks?
             webmock_response = build_webmock_response

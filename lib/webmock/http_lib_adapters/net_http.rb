@@ -81,7 +81,7 @@ module WebMock
             WebMock::CallbackRegistry.invoke_callbacks(
               {lib: :net_http}, request_signature, webmock_response)
             build_net_http_response(webmock_response, &block)
-          elsif WebMock.net_connect_allowed?(request_signature.uri)
+          elsif WebMock.net_connect_allowed?(request_signature.uri, request_signature.method)
             check_right_http_connection
             after_request = lambda do |response|
               if WebMock::CallbackRegistry.any_callbacks?

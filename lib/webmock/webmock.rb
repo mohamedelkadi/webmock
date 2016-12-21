@@ -53,20 +53,20 @@ module WebMock
     Config.instance.net_http_connect_on_start = options[:net_http_connect_on_start]
   end
 
-  def self.net_connect_allowed?(uri = nil)
+  def self.net_connect_allowed?(uri=nil, req_method=nil)
     if uri.is_a?(String)
       uri = WebMock::Util::URI.normalize_uri(uri)
     end
 
     Config.instance.allow_net_connect ||
     ( Config.instance.allow_localhost && WebMock::Util::URI.is_uri_localhost?(uri) ||
-      Config.instance.allow && net_connect_explicit_allowed?(Config.instance.allow, uri) )
+      Config.instance.allow && net_connect_explicit_allowed?(Config.instance.allow, uri ,req_method) )
   end
 
-  def self.net_connect_explicit_allowed?(allowed, uri=nil)
+  def self.net_connect_explicit_allowed?(allowed, uri=nil, req_method=nil)
     case allowed
     when Array
-      allowed.any? { |allowed_item| net_connect_explicit_allowed?(allowed_item, uri) }
+      allowed.any? { |allowed_item| net_connect_explicit_allowed?(allowed_item, uri, req_method) }
     when Regexp
       (uri.to_s =~ allowed) != nil ||
       (uri.omit(:port).to_s =~ allowed) != nil && uri.port == uri.default_port
@@ -78,7 +78,7 @@ module WebMock
       allowed == "#{uri.scheme}://#{uri.host}" && uri.port == uri.default_port
     else
       if allowed.respond_to?(:call)
-        allowed.call(uri)
+        allowed.call(uri, req_method)
       end
     end
   end
